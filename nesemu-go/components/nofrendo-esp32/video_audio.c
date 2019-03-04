@@ -469,15 +469,14 @@ static int ConvertJoystickInput()
 
     if (!ignoreMenuButton && previousJoystickState.values[ODROID_INPUT_MENU] && !state.values[ODROID_INPUT_MENU])
     {
+        printf("Stopping video queue.\n");
         odroid_audio_terminate();
 
-        printf("Stopping video queue.\n");
-
-        void* arg = 1;
-        xQueueSend(vidQueue, &arg, portMAX_DELAY);
-        while(exitVideoTaskFlag)
+        void *exitVideoTask = NULL;
+        xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
+        while (vidTaskIsRunning)
         {
-             vTaskDelay(10);
+           vTaskDelay(10);
         }
 
         // Set menu application
