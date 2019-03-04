@@ -185,11 +185,11 @@ void videoTask(void *arg)
 
 
     // Draw hourglass
-    odroid_display_lock_gb_display();
+    odroid_display_lock();
 
     odroid_display_show_hourglass();
 
-    odroid_display_unlock_gb_display();
+    odroid_display_unlock();
 
 
     videoTaskIsRunning = false;
