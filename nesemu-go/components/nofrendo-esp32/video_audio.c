@@ -446,45 +446,48 @@ static int ConvertJoystickInput()
     // Note: this will cause an exception on 2nd Core in Debug mode
     if (powerFrameCount > /*60*/ 30 * 1)
     {
-        printf("Stopping video queue.\n");
 
-        odroid_audio_terminate();
+       printf("Stopping video queue.\n");
+       odroid_audio_terminate();
 
-        void *exitVideoTask = NULL;
-        xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
-        while (vidTaskIsRunning) { vTaskDelay(10); }
+       void *exitVideoTask = NULL;
+       xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
+       while (vidTaskIsRunning)
+       {
+          vTaskDelay(10);
+       }
 
-        //odroid_display_drain_spi();
+       // Set menu application
+       odroid_system_application_set(0);
 
-        SaveState();
+       // Reset
+       esp_restart();
 
-
-        // Set menu application
-        odroid_system_application_set(0);
-
-
-        // Reset
-        esp_restart();
+       
     }
 
     if (!ignoreMenuButton && previousJoystickState.values[ODROID_INPUT_MENU] && !state.values[ODROID_INPUT_MENU])
     {
-        printf("Stopping video queue.\n");
-        odroid_audio_terminate();
+       printf("Stopping video queue.\n");
 
-        void *exitVideoTask = NULL;
-        xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
-        while (vidTaskIsRunning)
-        {
-           vTaskDelay(10);
-        }
+       odroid_audio_terminate();
 
-        // Set menu application
-        odroid_system_application_set(0);
+       void *exitVideoTask = NULL;
+       xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
+       while (vidTaskIsRunning)
+       {
+          vTaskDelay(10);
+       }
 
+       //odroid_display_drain_spi();
 
-        // Reset
-        esp_restart();
+       SaveState();
+
+       // Set menu application
+       odroid_system_application_set(0);
+
+       // Reset
+       esp_restart();
     }
 
     // Scaling

@@ -644,10 +644,7 @@ void app_main(void)
         //if (!lastJoysticState.Menu && joystick.Menu)
         if (menuButtonFrameCount > 60 * 1)
         {
-            // Save state
-            gpio_set_level(GPIO_NUM_2, 1);
-
-            DoMenuHome();
+            DoMenuHomeNoSave();
 
             gpio_set_level(GPIO_NUM_2, 0);
         }
@@ -655,10 +652,9 @@ void app_main(void)
         if (!ignoreMenuButton && lastJoysticState.values[ODROID_INPUT_MENU] && !joystick.values[ODROID_INPUT_MENU])
         {
             // Save state
-            //gpio_set_level(GPIO_NUM_2, 1);
+            gpio_set_level(GPIO_NUM_2, 1);
 
-            //DoMenu();
-            DoMenuHomeNoSave();
+            DoMenuHome();
 
             gpio_set_level(GPIO_NUM_2, 0);
         }

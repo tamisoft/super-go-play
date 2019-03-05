@@ -311,7 +311,7 @@ static void PowerDown()
     abort();
 }
 
-static void DoHome()
+static void DoMenuHome()
 {
     esp_err_t err;
 
@@ -341,7 +341,7 @@ static void DoHome()
     esp_restart();
 }
 
-static void DoHomeNoSave()
+static void DoMenuHomeNoSave()
 {
     esp_err_t err;
 
@@ -705,7 +705,7 @@ void app_main(void)
         // Note: this will cause an exception on 2nd Core in Debug mode
         if (powerFrameCount > 60 * 1)
         {
-            DoHome();
+            DoMenuHomeNoSave();
         }
 
         if (previousState.values[ODROID_INPUT_VOLUME] && !joystick.values[ODROID_INPUT_VOLUME])
@@ -716,7 +716,7 @@ void app_main(void)
 
         if (!ignoreMenuButton && previousState.values[ODROID_INPUT_MENU] && !joystick.values[ODROID_INPUT_MENU])
         {
-            DoHomeNoSave();
+            DoMenuHome();
         }
 
 
