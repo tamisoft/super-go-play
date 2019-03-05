@@ -344,7 +344,6 @@ static void DoHome()
 static void DoHomeNoSave()
 {
     esp_err_t err;
-    uint16_t* param = 1;
 
     // Clear audio to prevent studdering
     printf("PowerDown: stopping audio.\n");
@@ -354,9 +353,12 @@ static void DoHomeNoSave()
     // Stop tasks
     printf("PowerDown: stopping tasks.\n");
 
-    xQueueSend(vidQueue, &param, portMAX_DELAY);
-    while (videoTaskIsRunning) { vTaskDelay(1); }
-
+    void *exitVideoTask = NULL;
+    xQueueSend(vidQueue, &exitVideoTask, portMAX_DELAY);
+    while (videoTaskIsRunning)
+    {
+        vTaskDelay(10);
+    }
 
     // Set menu application
     odroid_system_application_set(0);
