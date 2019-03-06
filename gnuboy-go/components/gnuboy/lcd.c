@@ -819,10 +819,17 @@ void vram_dirty()
 {
 }
 
+int mod(int a, int b)
+{
+	int r = a % b;
+	return r < 0 ? r + b : r;
+}
+
 void pal_set(int palette)
 {
 	int i,j;
-	current_palette = palette % nr_of_palettes;
+
+	current_palette = mod(palette, nr_of_palettes);
 	
 	for(i = 0; i < 4; i++)
 	{
