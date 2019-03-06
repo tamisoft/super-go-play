@@ -823,6 +823,9 @@ void pal_set(int palette)
 {
 	int i,j;
 	current_palette = palette % nr_of_palettes;
+	if (current_palette == 0){
+		current_palette = nr_of_palettes - 1;
+	}
 	
 	for(i = 0; i < 4; i++)
 	{
@@ -838,6 +841,11 @@ void pal_set(int palette)
 void pal_next()
 {
 	pal_set(current_palette + 1);
+}
+
+void pal_previous()
+{
+	pal_set(current_palette - 1);
 }
 
 int pal_get()
