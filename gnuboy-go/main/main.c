@@ -675,10 +675,16 @@ void app_main(void)
         }
 
 		// Cycle through palets
-		if (joystick.values[ODROID_INPUT_START] && !lastJoysticState.values[ODROID_INPUT_LEFT] && joystick.values[ODROID_INPUT_LEFT])
+		if (joystick.values[ODROID_INPUT_SELECT] && !lastJoysticState.values[ODROID_INPUT_LEFT] && joystick.values[ODROID_INPUT_LEFT])
         {
 			pal_next();
 			odroid_settings_GBPalette_set(pal_get());
+        }
+
+        if (joystick.values[ODROID_INPUT_SELECT] && !lastJoysticState.values[ODROID_INPUT_RIGHT] && joystick.values[ODROID_INPUT_RIGHT])
+        {
+            pal_previous();
+            odroid_settings_GBPalette_set(pal_get());
         }
 
         pad_set(PAD_UP, joystick.values[ODROID_INPUT_UP]);

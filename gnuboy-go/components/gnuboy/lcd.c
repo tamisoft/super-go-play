@@ -840,6 +840,11 @@ void pal_next()
 	pal_set(current_palette + 1);
 }
 
+void pal_previous()
+{
+	pal_set(current_palette - 1);
+}
+
 int pal_get()
 {
 	return current_palette;
