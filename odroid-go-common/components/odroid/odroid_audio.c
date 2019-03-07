@@ -39,6 +39,8 @@ void odroid_audio_volume_change()
 {
     int level = (volumeLevel + 1) % ODROID_VOLUME_LEVEL_COUNT;
     odroid_audio_volume_set(level);
+
+    odroid_settings_Volume_set(level);
 }
 
 void odroid_audio_volume_increase()
@@ -48,11 +50,13 @@ void odroid_audio_volume_increase()
     if (level >= ODROID_VOLUME_LEVEL_COUNT)
     {
         odroid_audio_volume_set(ODROID_VOLUME_LEVEL_COUNT - 1);
+        odroid_settings_Volume_set(ODROID_VOLUME_LEVEL_COUNT - 1);
         preMuteVolumeLevel = 0;
     }
     else
     {
         odroid_audio_volume_set(level);
+        odroid_settings_Volume_set(level);
         preMuteVolumeLevel = 0;
     }
 }
@@ -64,11 +68,13 @@ void odroid_audio_volume_decrease()
     if (level < ODROID_VOLUME_LEVEL1)
     {
         odroid_audio_volume_set(ODROID_VOLUME_LEVEL1);
+        odroid_settings_Volume_set(ODROID_VOLUME_LEVEL1);
         preMuteVolumeLevel = 0;
     }
     else
     {
         odroid_audio_volume_set(level);
+        odroid_settings_Volume_set(level);
         preMuteVolumeLevel = 0;
     }
 }
@@ -78,12 +84,14 @@ void odroid_audio_volume_mute()
     if (volumeLevel == ODROID_VOLUME_LEVEL0)
     {
         odroid_audio_volume_set(preMuteVolumeLevel);
+        odroid_settings_Volume_set(preMuteVolumeLevel);
         preMuteVolumeLevel = 0;
     }
     else
     {
         preMuteVolumeLevel = volumeLevel;
         odroid_audio_volume_set(ODROID_VOLUME_LEVEL0);
+        odroid_settings_Volume_set(ODROID_VOLUME_LEVEL0);
     }
 }
 
