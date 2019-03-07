@@ -708,7 +708,7 @@ void app_main(void)
             DoMenuHomeNoSave();
         }
 
-        if (previousState.values[ODROID_INPUT_VOLUME] && !joystick.values[ODROID_INPUT_VOLUME])
+        if (!previousState.values[ODROID_INPUT_VOLUME] && joystick.values[ODROID_INPUT_VOLUME])
         {
             odroid_audio_volume_mute();
             printf("main: Volume=%d\n", odroid_audio_volume_get());
