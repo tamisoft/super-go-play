@@ -431,7 +431,7 @@ static int ConvertJoystickInput()
 
     if (!previousJoystickState.values[ODROID_INPUT_VOLUME] && state.values[ODROID_INPUT_VOLUME])
     {
-       odroid_audio_mute();
+       odroid_audio_volume_mute();
        printf("main: Volume=%d\n", odroid_audio_volume_get());
     }
 

@@ -710,7 +710,7 @@ void app_main(void)
 
         if (previousState.values[ODROID_INPUT_VOLUME] && !joystick.values[ODROID_INPUT_VOLUME])
         {
-            odroid_audio_mute();
+            odroid_audio_volume_mute();
             printf("main: Volume=%d\n", odroid_audio_volume_get());
         }
 

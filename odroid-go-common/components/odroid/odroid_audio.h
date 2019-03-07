@@ -20,7 +20,7 @@ odroid_volume_level odroid_audio_volume_get();
 void odroid_audio_volume_set(odroid_volume_level value);
 void odroid_audio_volume_increase();
 void odroid_audio_volume_decrease();
-void odroid_audio_mute();
+void odroid_audio_volume_mute();
 void odroid_audio_init(ODROID_AUDIO_SINK sink, int sample_rate);
 void odroid_audio_terminate();
 void odroid_audio_submit(short* stereoAudioBuffer, int frameCount);
