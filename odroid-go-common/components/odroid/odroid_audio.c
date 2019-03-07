@@ -35,6 +35,12 @@ void odroid_audio_volume_set(odroid_volume_level value)
     Volume = (float)volumeLevels[value] * 0.001f;
 }
 
+void odroid_audio_volume_change()
+{
+    int level = (volumeLevel + 1) % ODROID_VOLUME_LEVEL_COUNT;
+    odroid_audio_volume_set(level);
+}
+
 void odroid_audio_volume_increase()
 {
     int level = (volumeLevel == ODROID_VOLUME_LEVEL0) ? preMuteVolumeLevel + 1 : volumeLevel + 1;
@@ -76,8 +82,8 @@ void odroid_audio_volume_mute()
     }
     else
     {
-        odroid_audio_volume_set(ODROID_VOLUME_LEVEL0);
         preMuteVolumeLevel = volumeLevel;
+        odroid_audio_volume_set(ODROID_VOLUME_LEVEL0);
     }
 }
 

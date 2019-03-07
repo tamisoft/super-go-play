@@ -18,6 +18,7 @@ typedef enum
 
 odroid_volume_level odroid_audio_volume_get();
 void odroid_audio_volume_set(odroid_volume_level value);
+void odroid_audio_volume_change();
 void odroid_audio_volume_increase();
 void odroid_audio_volume_decrease();
 void odroid_audio_volume_mute();
