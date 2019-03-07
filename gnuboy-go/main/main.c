@@ -662,10 +662,21 @@ void app_main(void)
 
         if (!lastJoysticState.values[ODROID_INPUT_VOLUME] && joystick.values[ODROID_INPUT_VOLUME])
         {
-            odroid_audio_volume_change();
+            odroid_audio_volume_mute();
             printf("main: Volume=%d\n", odroid_audio_volume_get());
         }
 
+        if (joystick.values[ODROID_INPUT_VOLUME] && !lastJoysticState.values[ODROID_INPUT_UP] && joystick.values[ODROID_INPUT_UP])
+        {
+            odroid_audio_volume_increase();
+            printf("main: Volume=%d\n", odroid_audio_volume_get());
+        }
+
+        if (joystick.values[ODROID_INPUT_VOLUME] && !lastJoysticState.values[ODROID_INPUT_DOWN] && joystick.values[ODROID_INPUT_DOWN])
+        {
+            odroid_audio_volume_decrease();
+            printf("main: Volume=%d\n", odroid_audio_volume_get());
+        }
 
         // Scaling
         if (joystick.values[ODROID_INPUT_START] && !lastJoysticState.values[ODROID_INPUT_RIGHT] && joystick.values[ODROID_INPUT_RIGHT])

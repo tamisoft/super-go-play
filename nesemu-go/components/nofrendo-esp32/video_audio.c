@@ -431,7 +431,20 @@ static int ConvertJoystickInput()
 
     if (!previousJoystickState.values[ODROID_INPUT_VOLUME] && state.values[ODROID_INPUT_VOLUME])
     {
-        odroid_audio_volume_change();
+       odroid_audio_mute();
+       printf("main: Volume=%d\n", odroid_audio_volume_get());
+    }
+
+    if (state.values[ODROID_INPUT_VOLUME] && !previousJoystickState.values[ODROID_INPUT_UP] && state.values[ODROID_INPUT_UP])
+    {
+       odroid_audio_volume_increase();
+       printf("main: Volume=%d\n", odroid_audio_volume_get());
+    }
+
+    if (state.values[ODROID_INPUT_VOLUME] && !previousJoystickState.values[ODROID_INPUT_DOWN] && state.values[ODROID_INPUT_DOWN])
+    {
+       odroid_audio_volume_decrease();
+       printf("main: Volume=%d\n", odroid_audio_volume_get());
     }
 
     if (!ignoreMenuButton && previousJoystickState.values[ODROID_INPUT_MENU] && state.values[ODROID_INPUT_MENU])
