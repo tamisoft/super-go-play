@@ -1,7 +1,7 @@
 # Super Go-Play
 ![Super Go-Play](logo.png?raw=true "Super Go-Play")
 
-## What's New
+## About
 
 Super Go-Play is a combination of two other Go-Play forks [(more info here)](https://forum.odroid.com/viewtopic.php?f=159&p=248618), plus the following changes:
 
