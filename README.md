@@ -10,23 +10,24 @@ Super Go-Play is a combination of two other Go-Play forks [(more info here)](htt
 - Gameboy palette cycling changes
 - Reversed `MENU` button behavior
 - New name, logo and firmware tile image
-- Two versions: regular and one with reduced volume levels from [go-play-quiet](https://github.com/milesoberstadt/go-play-quiet)
+- Two versions: regular and quiet with reduced volume levels from "go-play-quiet"
 
 ## Full Feature List
 
 The full changes compared to Go-Play are:
 
 - **NES** - improved perfomance
-- **Gameboy** - Switch between color palettes with `SELECT + LEFT` and `SELECT + RIGHT`
+- **Gameboy** - Additional color palettes added. Switch between them with `SELECT + LEFT` and `SELECT + RIGHT`
 - **SMS** - improved performance, `START` / `SELECT` buttons are swapped
 - **MENU Button** - Hold `MENU` to exit game without saving
 - **VOLUME Button** - In game, press `VOLUME` to mute/unmute audio. Press `VOLUME + UP` to increase volume. Press `VOLUME + DOWN` to decrease volume.
 - New hour glass icon (50% larger, 100% more retro)
 - New name, logo and firmware tile image
+- Quiet version with reduced volume levels from "go-play-quiet"
 
 ## Download
 
-- [Latest release here](https://github.com/mattkj/super-go-play/releases/tag/v1.0.0)
+- [Latest release is here](https://github.com/mattkj/super-go-play/releases/tag/v1.0.0)
 
 ## Installation
 
