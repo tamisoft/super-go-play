@@ -148,11 +148,11 @@ void render_obj_tms(int line)
     {
         p = &sprites[i];
         lb = &linebuf[p->xpos];
-        lut = &tms_obj_lut[(p->attr & 0x0F) << 8];
+        lut = (uint8 *)&tms_obj_lut[(p->attr & 0x0F) << 8];
 
         /* Point to expanded PG data */
-        ex[0] = bp_expand[p->sg[0]];
-        ex[1] = bp_expand[p->sg[1]];
+        ex[0] = (uint8 *)bp_expand[p->sg[0]];
+        ex[1] = (uint8 *)bp_expand[p->sg[1]];
 
         /* Clip left edge */
         if(p->xpos < 0)
@@ -294,111 +294,6 @@ void render_obj_tms(int line)
 
 void make_tms_tables(void)
 {
-    int i, j, x;
-    int bd, pg, ct;
-    int sx, bx;
-
-#if 0
-    for(sx = 0; sx < 16; sx++)
-    {
-        for(bx = 0; bx < 256; bx++)
-        {
-//          uint8 bd = (bx & 0x0F);
-            uint8 bs = (bx & 0x40);
-//          uint8 bt = (bd == 0) ? 1 : 0;
-            uint8 sd = (sx & 0x0F);
-//          uint8 st = (sd == 0) ? 1 : 0;
-
-            // opaque sprite pixel, choose 2nd pal and set sprite marker
-            if(sd && !bs)
-            {
-                tms_obj_lut[(sx<<8)|(bx)] = sd | 0x10 | 0x40;
-            }
-            else
-            if(sd && bs)
-            {
-                // writing over a sprite
-                tms_obj_lut[(sx<<8)|(bx)] = bx;
-            }
-            else
-            {
-                tms_obj_lut[(sx<<8)|(bx)] = bx;
-            }
-        }
-    }
-#endif
-
-#if 0
-    /* Text lookup table */
-    for(bd = 0; bd < 256; bd++)
-    {
-        uint8 bg = (bd >> 0) & 0x0F;
-        uint8 fg = (bd >> 4) & 0x0F;
-
-        /* If foreground is transparent, use background color */
-        if(fg == 0) fg = bg;
-
-        txt_lookup[bd][0] = bg;
-        txt_lookup[bd][1] = fg;
-    }
-#endif
-
-#if 0
-    /* Multicolor lookup table */
-    for(bd = 0; bd < 16; bd++)
-    {
-        for(pg = 0; pg < 256; pg++)
-        {
-            int l = (pg >> 4) & 0x0F;
-            int r = (pg >> 0) & 0x0F;
-
-            /* If foreground is transparent, use background color */
-            if(l == 0) l = bd;
-            if(r == 0) r = bd;
-
-            /* Unpack 2 nibbles across eight pixels */
-            for(x = 0; x < 8; x++)
-            {
-                int c = (x & 4) ? r : l;
-
-                mc_lookup[bd][pg][x] = c;
-            }
-        }
-    }
-#endif
-
-#if 0
-    /* Make bitmap data expansion table */
-    memset(bp_expand, 0, sizeof(bp_expand));
-    for(i = 0; i < 256; i++)
-    {
-        for(j = 0; j < 8; j++)
-        {
-            int c = (i >> (j ^ 7)) & 1;
-            bp_expand[i][j] = c;
-        }
-    }
-#endif
-
-#if 0
-    /* Graphics I/II lookup table */
-    for(bd = 0; bd < 0x10; bd++)
-    {
-        for(ct = 0; ct < 0x100; ct++)
-        {
-            int backdrop = (bd & 0x0F);
-            int background = (ct >> 0) & 0x0F;
-            int foreground = (ct >> 4) & 0x0F;
-
-            /* If foreground is transparent, use background color */
-            if(background == 0) background = backdrop;
-            if(foreground == 0) foreground = backdrop;
-
-            tms_lookup[bd][ct][0] = background;
-            tms_lookup[bd][ct][1] = foreground;
-        }
-    }
-#endif
 
 }
 
@@ -458,8 +353,8 @@ static void render_bg_m0(int line)
     for(column = 0; column < 32; column++)
     {
         name = pn[column];
-        clut = &tms_lookup[vdp.bd][ct[name >> 3]][0];
-        bpex = &bp_expand[pg[name << 3]][0];
+        clut = (uint8 *)&tms_lookup[vdp.bd][ct[name >> 3]][0];
+        bpex = (uint8 *)&bp_expand[pg[name << 3]][0];
         RENDER_GR_LINE
     }
 }
@@ -480,11 +375,11 @@ static void render_bg_m1(int line)
     uint8 *pg = &vdp.vram[vdp.pg | (v_row)];
     uint8 bk = vdp.reg[7];
 
-    clut = &txt_lookup[bk][0];
+    clut = (uint8 *)&txt_lookup[bk][0];
 
     for(column = 0; column < 40; column++)
     {
-        bpex = &bp_expand[pg[pn[column] << 3]][0];
+        bpex = (uint8 *)&bp_expand[pg[pn[column] << 3]][0];
         RENDER_TX_LINE
     }
 
@@ -508,11 +403,11 @@ static void render_bg_m1x(int line)
     uint8 *pg = &vdp.vram[vdp.pg + (v_row) + ((line & 0xC0) << 5)];
     uint8 bk = vdp.reg[7];
 
-    clut = &tms_lookup[0][bk][0];
+    clut = (uint8 *)&tms_lookup[0][bk][0];
 
     for(column = 0; column < 40; column++)
     {
-        bpex = &bp_expand[pg[pn[column] << 3]][0];
+        bpex = (uint8 *)&bp_expand[pg[pn[column] << 3]][0];
         RENDER_TX_LINE
     }
     RENDER_TX_BORDER
@@ -527,11 +422,11 @@ static void render_bg_inv(int line)
     uint8 *lb = &linebuf[0];
     uint8 bk = vdp.reg[7];
 
-    clut = &txt_lookup[bk][0];
+    clut = (uint8 *)&txt_lookup[bk][0];
 
     for(column = 0; column < 40; column++)
     {
-        bpex = &bp_expand[0xF0][0];
+        bpex = (uint8 *)&bp_expand[0xF0][0];
         RENDER_TX_LINE
     }
 }
@@ -548,7 +443,7 @@ static void render_bg_m3(int line)
 
     for(column = 0; column < 32; column++)
     {
-        mcex = &mc_lookup[vdp.bd][pg[pn[column]<<3]][0];
+        mcex = (uint8 *)&mc_lookup[vdp.bd][pg[pn[column]<<3]][0];
         RENDER_MC_LINE
     }
 }
@@ -564,7 +459,7 @@ static void render_bg_m3x(int line)
 
     for(column = 0; column < 32; column++)
     {
-        mcex = &mc_lookup[vdp.bd][pg[pn[column]<<3]][0];
+        mcex = (uint8 *)&mc_lookup[vdp.bd][pg[pn[column]<<3]][0];
         RENDER_MC_LINE
     }
 }
@@ -586,8 +481,8 @@ static void render_bg_m2(int line)
     for(column = 0; column < 32; column++)
     {
         name = pn[column] << 3;
-        clut = &tms_lookup[vdp.bd][ct[name]][0];
-        bpex = &bp_expand[pg[name]][0];
+        clut = (uint8 *)&tms_lookup[vdp.bd][ct[name]][0];
+        bpex = (uint8 *)&bp_expand[pg[name]][0];
         RENDER_GR_LINE
     }
 }
