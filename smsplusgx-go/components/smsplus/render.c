@@ -233,99 +233,9 @@ void render_shutdown(void)
 /* Initialize the rendering data */
 void render_init(void)
 {
-  int i, j;
-  int bx, sx, b, s, bp, bf, sf, c;
+  int i;
 
   make_tms_tables();
-
-#if 0
-  /* Generate 64k of data for the look up table */
-  for(bx = 0; bx < 0x100; bx++)
-  {
-    for(sx = 0; sx < 0x100; sx++)
-    {
-      /* Background pixel */
-      b  = (bx & 0x0F);
-
-      /* Background priority */
-      bp = (bx & 0x20) ? 1 : 0;
-
-      /* Full background pixel + priority + sprite marker */
-      bf = (bx & 0x7F);
-
-      /* Sprite pixel */
-      s  = (sx & 0x0F);
-
-      /* Full sprite pixel, w/ palette and marker bits added */
-      sf = (sx & 0x0F) | 0x10 | 0x40;
-
-      /* Overwriting a sprite pixel ? */
-      if(bx & 0x40)
-      {
-        /* Return the input */
-        c = bf;
-      }
-      else
-      {
-        /* Work out priority and transparency for both pixels */
-        if(bp)
-        {
-          /* Underlying pixel is high priority */
-          if(b)
-          {
-            c = bf | 0x40;
-          }
-          else
-          {
-            if(s)
-            {
-              c = sf;
-            }
-            else
-            {
-              c = bf;
-            }
-          }
-        }
-        else
-        {
-          /* Underlying pixel is low priority */
-          if(s)
-          {
-            c = sf;
-          }
-          else
-          {
-            c = bf;
-          }
-        }
-      }
-
-      /* Store result */
-      lut[(bx << 8) | (sx)] = c;
-    }
-  }
-#endif
-
-#if 0
-  /* Make bitplane to pixel lookup table */
-  for(i = 0; i < 0x100; i++)
-  for(j = 0; j < 0x100; j++)
-  {
-    int x;
-    uint32 out = 0;
-    for(x = 0; x < 8; x++)
-    {
-      out |= (j & (0x80 >> x)) ? (uint32)(8 << (x << 2)) : 0;
-      out |= (i & (0x80 >> x)) ? (uint32)(4 << (x << 2)) : 0;
-    }
-#if LSB_FIRST
-    bp_lut[(j << 8) | (i)] = out;
-#else
-    bp_lut[(i << 8) | (j)] = out;
-#endif
-  }
- #endif
 
   sms_cram_expand_table[0] =  0;
   sms_cram_expand_table[1] = (5 << 3)  + (1 << 2);
@@ -523,7 +433,7 @@ static IRAM_ATTR void* tile_get(short attr, short line)
 
     const uint16 y = (attr & 0x400) ? (line ^ 7) : line;
 
-    const uint16* ptr = &vdp.vram[(name << 5) | (y << 2) | (0)];
+    const uint16* ptr = (uint16 *)&vdp.vram[(name << 5) | (y << 2) | (0)];
     const uint16 bp01 = *ptr++;
     const uint16 bp23 = *ptr;
     const uint32 temp = (bp_lut[bp01] >> 2) | (bp_lut[bp23]);
@@ -555,7 +465,6 @@ IRAM_ATTR void render_bg_sms(int line)
   uint32 atex_mask;
   uint32 *cache_ptr;
   uint32 *linebuf_ptr = (uint32 *)&linebuf[0 - shift];
-  uint8* ctp;
 
   /* Draw first column (clipped) */
   if(shift)
@@ -588,40 +497,8 @@ IRAM_ATTR void render_bg_sms(int line)
     /* Expand priority and palette bits */
     atex_mask = atex[(attr >> 11) & 3];
 
-#if 0
-    /* Point to a line of pattern data in cache */
-    cache_ptr = (uint32 *)&bg_pattern_cache[((attr & 0x7FF) << 6) | (v_row)];
-#else
-    // ---p cvhn nnnn nnnn
-
-    // uint8 data[8];
-    // uint16 name = attr & 0x1ff;
-    //
-    // uint16 y = line & 7;
-    // if (attr & 0x400)
-    // {
-    //     y = (y ^ 7);
-    // }
-    //
-    // uint16 bp01 = *(uint16 *)&vdp.vram[(name << 5) | (y << 2) | (0)];
-    // uint16 bp23 = *(uint16 *)&vdp.vram[(name << 5) | (y << 2) | (2)];
-    // uint32 temp = (bp_lut[bp01] >> 2) | (bp_lut[bp23]);
-    //
-    // uint8 rot = (attr >> (1 + 8)) & 0x03;
-    // for(short x = 0; x < 8; x++)
-    // {
-    //     uint8 c = (temp >> (x << 2)) & 0x0F;
-    //     short index = (attr & 0x2000) ? (x ^ 7) : x;
-    //     data[index] = (c);
-    //
-    //   //dst[0x08000 | (y << 3) | (x ^ 7)] = (c);
-    //   //dst[0x10000 | ((y ^ 7) << 3) | (x)] = (c);
-    //   //dst[0x18000 | ((y ^ 7) << 3) | (x ^ 7)] = (c);
-    // }
-
     cache_ptr = tile_get(attr, v_row >> 3);
 
-#endif
     /* Copy the left half, adding the attribute bits in */
     write_dword( &linebuf_ptr[(column << 1)] , read_dword( &cache_ptr[0] ) | (atex_mask));
 
