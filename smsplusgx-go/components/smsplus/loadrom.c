@@ -22,7 +22,7 @@
 
 #include "shared.h"
 
-extern unsigned long crc32(crc, buf, len);
+extern unsigned long crc32(unsigned long, const unsigned char *, unsigned int);
 
 #define GAME_DATABASE_CNT 93
 
@@ -378,7 +378,7 @@ int load_rom (char *filename)
         fd = fopen("/sd/roms/col/BIOS.col", "rb");
         if(!fd) abort();
 
-        coleco.rom = ESP32_PSRAM + 0x100000;
+        coleco.rom = (uint8 *)(ESP32_PSRAM + 0x100000);
 
         fread(coleco.rom, 0x2000, 1, fd);
 
@@ -407,8 +407,8 @@ int load_rom (char *filename)
     cart.size = actual_size;
     if (cart.size < 0x4000) cart.size = 0x4000;
 
-    cart.rom = ESP32_PSRAM;
-    size_t cnt = fread(cart.rom, cart.size, 1, fd);
+    cart.rom = (uint8 *)ESP32_PSRAM;
+    size_t __attribute__((unused)) cnt = fread(cart.rom, cart.size, 1, fd);
     //if (cnt != 1) abort();
     __asm__("nop");
     __asm__("nop");
