@@ -126,7 +126,7 @@ static void initmem(void *mem, int size)
 	memset(p, 0xff /*memfill*/, size);
 }
 
-static byte *loadfile(FILE *f, int *len)
+static byte __attribute__((unused)) *loadfile(FILE *f, int *len)
 {
 	int l = 0, c = 0;
 	byte *d = NULL;
@@ -173,12 +173,12 @@ static void inflate_callback(byte b)
 	{
 		inf_len += 512;
 		inf_buf = realloc(inf_buf, inf_len);
-		if (!inf_buf) die("out of memory inflating file @ %d bytes\n", inf_pos);
+		if (!inf_buf) die((char *)"out of memory inflating file @ %d bytes\n", inf_pos);
 	}
 	inf_buf[inf_pos++] = b;
 }
 
-static byte *decompress(byte *data, int *len)
+static byte __attribute__((unused)) *decompress(byte *data, int *len)
 {
 	long pos = 0;
 	if (data[0] != 0x1f || data[1] != 0x8b)
@@ -195,7 +195,7 @@ static byte *decompress(byte *data, int *len)
 int rom_load()
 {
 	byte c, *data, *header;
-	int len = 0, rlen;
+	int rlen;
 
 	data = (void*)0x3f800000;
 
@@ -204,9 +204,6 @@ int rom_load()
 	{
 		printf("loader: Reading from flash.\n");
 
-		// copy from flash
-		spi_flash_mmap_handle_t hrom;
-
 		const esp_partition_t* part = esp_partition_find_first(0x40, 0, NULL);
 		if (part == 0)
 		{
@@ -214,7 +211,6 @@ int rom_load()
 			abort();
 		}
 
-		void* flashAddress;
 		for (size_t offset = 0; offset < 0x400000; offset += 0x100000)
 		{
 			esp_err_t err = esp_partition_read(part, offset, (void *)(data + offset), 0x100000);
@@ -293,8 +289,8 @@ int rom_load()
 	mbc.romsize = romsize_table[(tmp & 0xff)];
 	mbc.ramsize = ramsize_table[((tmp >> 8) & 0xff)];
 
-	if (!mbc.romsize) die("unknown ROM size %02X\n", header[0x0148]);
-	if (!mbc.ramsize) die("unknown SRAM size %02X\n", header[0x0149]);
+	if (!mbc.romsize) die((char *)"unknown ROM size %02X\n", header[0x0148]);
+	if (!mbc.ramsize) die((char *)"unknown SRAM size %02X\n", header[0x0149]);
 
 	const char* mbcName;
 	switch (mbc.type)
@@ -354,7 +350,7 @@ int rom_load()
 		if (rlen <= (0x100000 * 3) &&
 			sram_length <= 0x100000)
 		{
-			ram.sbank = data + (0x100000 * 3);
+			ram.sbank = (byte (*)[8192])data + (0x100000 * 3);
 			printf("SRAM using PSRAM.\n");
 		}
 		else
@@ -388,7 +384,6 @@ int sram_load()
 
 
 	const esp_partition_t* part;
-	spi_flash_mmap_handle_t hrom;
 	esp_err_t err;
 
 	part=esp_partition_find_first(0x40, 2, NULL);
@@ -422,7 +417,6 @@ int sram_save()
 		return -1;
 
 	const esp_partition_t* part;
-	spi_flash_mmap_handle_t hrom;
 	esp_err_t err;
 
 	part=esp_partition_find_first(0x40, 2, NULL);
@@ -523,7 +517,7 @@ void loader_unload()
 	if (romfile) free(romfile);
 	if (sramfile) free(sramfile);
 	if (saveprefix) free(saveprefix);
-	if (rom.bank) free(rom.bank);
+	// if (rom.bank) free(rom.bank);
 	if (ram.sbank) free(ram.sbank);
 	romfile = sramfile = saveprefix = 0;
 	rom.bank[0] = 0;
@@ -532,15 +526,15 @@ void loader_unload()
 }
 
 /* basename/dirname like function */
-static char *base(char *s)
+static char __attribute__((unused)) *base(char *s)
 {
 	char *p;
-	p = (char *) strrchr((unsigned char)s, DIRSEP_CHAR);
+	p = (char *) strrchr((const char *)s, DIRSEP_CHAR);
 	if (p) return p+1;
 	return s;
 }
 
-static char *ldup(char *s)
+static char __attribute__((unused)) *ldup(char *s)
 {
 	int i;
 	char *n, *p;
@@ -550,7 +544,7 @@ static char *ldup(char *s)
 	return n;
 }
 
-static void cleanup()
+static void __attribute__((unused)) cleanup()
 {
 	sram_save();
 	rtc_save();
@@ -559,8 +553,6 @@ static void cleanup()
 
 void loader_init(char *s)
 {
-	char *name, *p;
-
 	rom_load();
 	rtc_load();
 
@@ -569,15 +561,15 @@ void loader_init(char *s)
 
 rcvar_t loader_exports[] =
 {
-	RCV_STRING("savedir", &savedir),
-	RCV_STRING("savename", &savename),
-	RCV_INT("saveslot", &saveslot),
-	RCV_BOOL("forcebatt", &forcebatt),
-	RCV_BOOL("nobatt", &nobatt),
-	RCV_BOOL("forcedmg", &forcedmg),
-	RCV_BOOL("gbamode", &gbamode),
-	RCV_INT("memfill", &memfill),
-	RCV_INT("memrand", &memrand),
+	RCV_STRING((char *)"savedir", &savedir),
+	RCV_STRING((char *)"savename", &savename),
+	RCV_INT((char *)"saveslot", &saveslot),
+	RCV_BOOL((char *)"forcebatt", &forcebatt),
+	RCV_BOOL((char *)"nobatt", &nobatt),
+	RCV_BOOL((char *)"forcedmg", &forcedmg),
+	RCV_BOOL((char *)"gbamode", &gbamode),
+	RCV_INT((char *)"memfill", &memfill),
+	RCV_INT((char *)"memrand", &memrand),
 	RCV_END
 };
 

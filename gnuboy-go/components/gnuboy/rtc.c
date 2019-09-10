@@ -15,7 +15,7 @@ static int syncrtc = 1;
 
 rcvar_t rtc_exports[] =
 {
-	RCV_BOOL("syncrtc", &syncrtc),
+	RCV_BOOL((char *)"syncrtc", &syncrtc),
 	RCV_END
 };
 

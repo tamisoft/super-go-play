@@ -393,6 +393,7 @@ byte IRAM_ATTR ioreg_read(byte r)
 	case RI_HDMA4:
 	case RI_HDMA5:
 		if (hw.cgb) return REG(r);
+		__attribute__ ((fallthrough));
 	default:
 		return 0xff;
 	}
@@ -654,9 +655,6 @@ byte IRAM_ATTR mem_read(int a)
 {
 	int n;
 	byte ha = (a>>12) & 0xE;
-	int index;
-	byte* bnk;
-	int tmp;
 
 	//printf("read ha=0x%04x, a=0x%04x\n", ha, a);
 

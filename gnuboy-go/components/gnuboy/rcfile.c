@@ -17,7 +17,7 @@ int rc_sourcefile(char *filename)
 	char *name;
 	char line[256], *p;
 
-	name = path_search(filename, "r", rcpath);
+	name = path_search(filename, (char *)"r", rcpath);
 	f = fopen(name, "r");
 	if (!f) return -1;
 
@@ -36,7 +36,7 @@ int rc_sourcefile(char *filename)
 
 rcvar_t rcfile_exports[] =
 {
-	RCV_STRING("rcpath", &rcpath),
+	RCV_STRING((char *)"rcpath", &rcpath),
 	RCV_END
 };
 

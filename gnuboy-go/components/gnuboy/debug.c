@@ -12,7 +12,7 @@
 #ifndef GNUBOY_DISABLE_DEBUG_DISASSEMBLE
 #include "fastmem.h"
 
-static char *mnemonic_table[256] =
+static const char *mnemonic_table[256] =
 {
 	"NOP",
 	"LD BC,%w",
@@ -272,7 +272,7 @@ static char *mnemonic_table[256] =
 	"RST 38h"
 };
 
-static char *cb_mnemonic_table[256] =
+static const char *cb_mnemonic_table[256] =
 {
 	"RLC B",
 	"RLC C",
@@ -560,7 +560,7 @@ int debug_trace = 0;
 
 rcvar_t debug_exports[] =
 {
-	RCV_BOOL("trace", &debug_trace),
+	RCV_BOOL((char *)"trace", &debug_trace),
 	RCV_END
 };
 
@@ -585,14 +585,14 @@ void debug_disassemble(addr a, int c)
 		code = ops[k++] = readb(a); a++;
 		if (code != 0xCB)
 		{
-			pattern = mnemonic_table[code];
+			pattern = (char *)mnemonic_table[code];
 			if (!pattern)
-				pattern = "***INVALID***";
+				pattern = (char *)"***INVALID***";
 		}
 		else
 		{
 			code = ops[k++] = readb(a); a++;
-			pattern = cb_mnemonic_table[code];
+			pattern = (char *)cb_mnemonic_table[code];
 		}
 		i = j = 0;
 		while (pattern[i])

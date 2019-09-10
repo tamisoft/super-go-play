@@ -20,7 +20,7 @@ void rc_export(rcvar_t *v)
 	nvars++;
 	rcvars = realloc(rcvars, sizeof (rcvar_t) * (nvars+1));
 	if (!rcvars)
-		die("out of memory adding rcvar %s\n", v->name);
+		die((char *)"out of memory adding rcvar %s\n", v->name);
 	rcvars[nvars-1] = *v;
 	rcvars[nvars] = end;
 }
@@ -118,7 +118,7 @@ int rc_setvar_n(int i, int c, char **v)
 		if (*s) free(*s);
 		*s = strdup(v[0]);
 		if (!*s)
-			die("out of memory setting rcvar %s\n", rcvars[i].name);
+			die((char *)"out of memory setting rcvar %s\n", rcvars[i].name);
 		return 0;
 	case rcv_vector:
 		if (c > rcvars[i].len)

@@ -2,7 +2,7 @@
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "esp_event.h"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
@@ -15,6 +15,7 @@
 #include "driver/rtc_io.h"
 #include "esp_partition.h"
 #include "esp_ota_ops.h"
+#include "esp_sleep.h"
 
 #include "../components/gnuboy/loader.h"
 #include "../components/gnuboy/hw.h"
@@ -77,7 +78,7 @@ float Volume = 1.0f;
 
 int pcm_submit()
 {
-    odroid_audio_submit(currentAudioBufferPtr, currentAudioSampleCount >> 1);
+    odroid_audio_submit((int16_t *)currentAudioBufferPtr, currentAudioSampleCount >> 1);
 
     return 1;
 }
@@ -114,7 +115,7 @@ void run_to_vblank()
       currentBuffer = currentBuffer ? 0 : 1;
       framebuffer = displayBuffer[currentBuffer];
 
-      fb.ptr = framebuffer;
+      fb.ptr = (byte *)framebuffer;
   }
 
   rtc_tick();
@@ -123,15 +124,15 @@ void run_to_vblank()
 
   //if (pcm.pos > 100)
   {
-        currentAudioBufferPtr = audioBuffer[currentAudioBuffer];
+        currentAudioBufferPtr = (int16_t *)audioBuffer[currentAudioBuffer];
         currentAudioSampleCount = pcm.pos;
 
-        void* tempPtr = 0x1234;
+        void* tempPtr = (void *)0x1234;
         xQueueSend(audioQueue, &tempPtr, portMAX_DELAY);
 
         // Swap buffers
         currentAudioBuffer = currentAudioBuffer ? 0 : 1;
-        pcm.buf = audioBuffer[currentAudioBuffer];
+        pcm.buf = (int16_t *)audioBuffer[currentAudioBuffer];
         pcm.pos = 0;
   }
 
@@ -158,8 +159,6 @@ bool previous_scale_enabled = true;
 
 void videoTask(void *arg)
 {
-  esp_err_t ret;
-
   videoTaskIsRunning = true;
 
   uint16_t* param;
@@ -167,7 +166,7 @@ void videoTask(void *arg)
   {
         xQueuePeek(vidQueue, &param, portMAX_DELAY);
 
-        if (param == 1)
+        if (param == (uint16_t *)1)
             break;
 
         if (previous_scale_enabled != scaling_enabled)
@@ -215,7 +214,7 @@ void audioTask(void* arg)
         // TODO: determine if this is still needed
         abort();
     }
-    else if (param == 1)
+    else if (param == (uint16_t *)1)
     {
         break;
     }
@@ -347,9 +346,9 @@ static void LoadState(const char* cartName)
     Volume = odroid_settings_Volume_get();
 }
 
-static void PowerDown()
+static void __attribute__((unused)) PowerDown()
 {
-    uint16_t* param = 1;
+    uint16_t* param = (uint16_t *)1;
 
     // Clear audio to prevent studdering
     printf("PowerDown: stopping audio.\n");
@@ -382,8 +381,7 @@ static void PowerDown()
 
 static void DoMenuHome()
 {
-    esp_err_t err;
-    uint16_t* param = 1;
+    uint16_t* param = (uint16_t *)1;
 
     // Clear audio to prevent studdering
     printf("PowerDown: stopping audio.\n");
@@ -413,8 +411,7 @@ static void DoMenuHome()
 }
 static void DoMenuHomeNoSave()
 {
-    esp_err_t err;
-    uint16_t* param = 1;
+    uint16_t* param = (uint16_t *)1;
 
     // Clear audio to prevent studdering
     printf("PowerDown: stopping audio.\n");
@@ -567,7 +564,7 @@ void app_main(void)
   	fb.pelsize = 2;
   	fb.pitch = fb.w * fb.pelsize;
   	fb.indexed = 0;
-  	fb.ptr = framebuffer;
+  	fb.ptr = (byte *)framebuffer;
   	fb.enabled = 1;
   	fb.dirty = 0;
 
@@ -585,7 +582,7 @@ void app_main(void)
   	pcm.buf = heap_caps_malloc(AUDIO_BUFFER_SIZE, MALLOC_CAP_8BIT | MALLOC_CAP_DMA);
   	pcm.pos = 0;
 
-    audioBuffer[0] = pcm.buf;
+    audioBuffer[0] = (int32_t *)pcm.buf;
     audioBuffer[1] = heap_caps_malloc(AUDIO_BUFFER_SIZE, MALLOC_CAP_8BIT | MALLOC_CAP_DMA);
 
     if (audioBuffer[0] == 0 || audioBuffer[1] == 0)

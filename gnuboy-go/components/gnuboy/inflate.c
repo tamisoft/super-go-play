@@ -133,7 +133,7 @@ get_tables (const unsigned char *data, long *p,
   char clen_size_table[CLEN_TSIZE];
   unsigned int clen_code_table[CLEN_TSIZE];
   int j;
-  unsigned int b;
+  int b;
   int remainder; /* See note at end of section 3.2.7 of rfc1951. */
   char rem_val;
 
@@ -277,7 +277,7 @@ get_data (const unsigned char *data, long *p,
      /* Do the actual uncompressing.  Call callback on each character
       * uncompressed. */
 {
-  unsigned int b;
+  int b;
 
   while ( 1 ) {
     b = decode_one (data, p, hlit_size_table, HLIT_TSIZE,
@@ -434,7 +434,7 @@ inflate (const unsigned char *data, long *p,
   else if ( btype == 0 )
     /* Non compressed block */
     {
-      unsigned int len, nlen;
+      unsigned int len, __attribute__((unused)) nlen;
       unsigned int l;
       unsigned char b;
 
@@ -480,8 +480,9 @@ unzip (const unsigned char *data, long *p,
       return -1;
     }
   flg = read_bits (data, p, 8);
-  if ( flg & 0xe0 )
-    /* fprintf (stderr, "Warning: unknown bits are set in flags.\n") */ ;
+  if ( flg & 0xe0 ) {
+    /* fprintf (stderr, "Warning: unknown bits are set in flags.\n"); */
+  }
   read_bits (data, p, 32); /* Ignore modification time */
   read_bits (data, p, 8); /* Ignore extra flags */
   read_bits (data, p, 8); /* Ignore OS type */

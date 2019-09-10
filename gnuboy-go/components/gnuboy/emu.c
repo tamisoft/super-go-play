@@ -104,7 +104,7 @@ void emu_run()
 		}
 		doevents();
 		vid_begin();
-		if (framecount) { if (!--framecount) die("finished\n"); }
+		if (framecount) { if (!--framecount) die((char *)"finished\n"); }
 
 		if (!(R_LCDC & 0x80)) {
 			/* LCDC operation stopped */

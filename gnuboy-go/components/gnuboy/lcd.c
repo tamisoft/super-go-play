@@ -190,7 +190,7 @@ static void IRAM_ATTR tilebuf()
 	tilemap = lcd.vbank[0] + base;
 	attrmap = lcd.vbank[1] + base;
 	tilebuf = BG;
-	wrap = wraptable + S;
+	wrap = (short *)(wraptable + S);
 	cnt = ((WX + 7) >> 3) + 1;
 
 	if (hw.cgb)
@@ -282,7 +282,7 @@ static void IRAM_ATTR bg_scan()
 	tile = BG;
 	dest = BUF;
 
-	src = get_patpix(*(tile++), V) + U;
+	src = (byte *)(get_patpix(*(tile++), V) + U);
 
 #if 0
 	memcpy(dest, src, 8-U);
@@ -292,20 +292,28 @@ static void IRAM_ATTR bg_scan()
 	{
 		case 8:
 			dest[7] = src[7];
+			__attribute__ ((fallthrough));
 		case 7:
 			dest[6] = src[6];
+			__attribute__ ((fallthrough));
 		case 6:
 			dest[5] = src[5];
+			__attribute__ ((fallthrough));
 		case 5:
 			dest[4] = src[4];
+			__attribute__ ((fallthrough));
 		case 4:
 			dest[3] = src[2];
+			__attribute__ ((fallthrough));
 		case 3:
 			dest[2] = src[2];
+			__attribute__ ((fallthrough));
 		case 2:
 			dest[1] = src[1];
+			__attribute__ ((fallthrough));
 		case 1:
 			dest[0] = src[0];
+			__attribute__ ((fallthrough));
 		default:
 			break;
 	}
@@ -316,7 +324,7 @@ static void IRAM_ATTR bg_scan()
 	if (cnt <= 0) return;
 	while (cnt >= 8)
 	{
-		src = get_patpix(*(tile++), V);
+		src = (byte *)get_patpix(*(tile++), V);
 
 #if 0
 		MEMCPY8(dest, src);
@@ -330,7 +338,7 @@ static void IRAM_ATTR bg_scan()
 		dest += 8;
 		cnt -= 8;
 	}
-	src = get_patpix(*tile, V);
+	src = (byte *)get_patpix(*tile, V);
 	while (cnt--)
 		*(dest++) = *(src++);
 }
@@ -348,7 +356,7 @@ static void IRAM_ATTR wnd_scan()
 
 	while (cnt >= 8)
 	{
-		src = get_patpix(*(tile++), WV);
+		src = (byte *)get_patpix(*(tile++), WV);
 
 #if 0
 		MEMCPY8(dest, src);
@@ -362,7 +370,7 @@ static void IRAM_ATTR wnd_scan()
 		dest += 8;
 		cnt -= 8;
 	}
-	src = get_patpix(*tile, WV);
+	src = (byte *)get_patpix(*tile, WV);
 	while (cnt--)
 		*(dest++) = *(src++);
 }
@@ -446,19 +454,19 @@ static void IRAM_ATTR bg_scan_color()
 	tile = BG;
 	dest = BUF;
 
-	src = get_patpix(*(tile++),V) + U;
+	src = (byte *)(get_patpix(*(tile++),V) + U);
 	blendcpy(dest, src, *(tile++), 8-U);
 	dest += 8-U;
 	cnt -= 8-U;
 	if (cnt <= 0) return;
 	while (cnt >= 8)
 	{
-		src = get_patpix(*(tile++), V);
+		src = (byte *)get_patpix(*(tile++), V);
 		blendcpy(dest, src, *(tile++), 8);
 		dest += 8;
 		cnt -= 8;
 	}
-	src = get_patpix(*(tile++), V);
+	src = (byte *)get_patpix(*(tile++), V);
 	blendcpy(dest, src, *(tile++), cnt);
 }
 #endif
@@ -476,12 +484,12 @@ static void IRAM_ATTR wnd_scan_color()
 
 	while (cnt >= 8)
 	{
-		src = get_patpix(*(tile++), WV);
+		src = (byte *)get_patpix(*(tile++), WV);
 		blendcpy(dest, src, *(tile++), 8);
 		dest += 8;
 		cnt -= 8;
 	}
-	src = get_patpix(*(tile++), WV);
+	src = (byte *)get_patpix(*(tile++), WV);
 	blendcpy(dest, src, *(tile++), cnt);
 }
 
@@ -490,7 +498,7 @@ inline static void recolor(byte *buf, byte fill, int cnt)
 	while (cnt--) *(buf++) |= fill;
 }
 
-static void IRAM_ATTR spr_count()
+static void IRAM_ATTR __attribute__((unused)) spr_count()
 {
 	int i;
 	struct obj *o;
@@ -579,7 +587,7 @@ static void IRAM_ATTR spr_enum()
 	}
 
 #if 1
-	memcpy(VS, ts, sizeof VS);
+	memcpy(VS, ts, sizeof ts);
 #else
 	int* vsPtr = (int*)VS;
 	int* tsPtr = (int*)ts;
@@ -617,7 +625,7 @@ static void IRAM_ATTR spr_scan()
 
 	for (; ns; ns--, vs--)
 	{
-		byte* sbuf = get_patpix(vs->pat, vs->v);
+		byte* sbuf = (byte *)get_patpix(vs->pat, vs->v);
 
 		x = vs->x;
 		if (x >= 160) continue;
