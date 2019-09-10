@@ -283,7 +283,7 @@ static void LoadState(const char* cartName)
     Volume = odroid_settings_Volume_get();
 }
 
-static void PowerDown()
+static void  __attribute__((unused)) PowerDown()
 {
     // Stop tasks
     printf("PowerDown: stopping tasks.\n");
@@ -313,8 +313,6 @@ static void PowerDown()
 
 static void DoMenuHome()
 {
-    esp_err_t err;
-
     // Stop tasks
     printf("PowerDown: stopping tasks.\n");
 
@@ -343,8 +341,6 @@ static void DoMenuHome()
 
 static void DoMenuHomeNoSave()
 {
-    esp_err_t err;
-
     // Clear audio to prevent studdering
     printf("PowerDown: stopping audio.\n");
     odroid_audio_terminate();
@@ -576,7 +572,7 @@ void app_main(void)
     }
 
     // Load the ROM
-    load_rom(FILENAME);
+    load_rom((char *)FILENAME);
 
     //printf("%s: cart.crc=%#010lx\n", __func__, cart.crc);
 
