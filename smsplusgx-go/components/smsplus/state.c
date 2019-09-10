@@ -82,7 +82,6 @@ int system_save_state(void *mem)
 void system_load_state(void *mem)
 {
   int i;
-  uint8 *buf;
 
   printf("%s: sizeof sms=%d\n", __func__, sizeof(sms));
   printf("%s: sizeof vdp=%d\n", __func__, sizeof(vdp));
@@ -125,15 +124,6 @@ void system_load_state(void *mem)
   int (*irq_cb)(int) = Z80.irq_callback;
   fread(&Z80, sizeof(Z80), 1, mem);
   Z80.irq_callback = irq_cb;
-
-#if 0
-  /*** Set YM2413 ***/
-  buf = malloc(FM_GetContextSize());
-  memcpy (buf, &state[bufferptr], FM_GetContextSize ());
-  FM_SetContext(buf);
-  free(buf);
-  bufferptr += FM_GetContextSize ();
-#endif
 
   // Preserve clock rate
   SN76489_Context* psg = (SN76489_Context*)SN76489_GetContextPtr(0);
