@@ -558,7 +558,7 @@ static const funcptr tablename[0x100] = {  \
   prefix##_f8,prefix##_f9,prefix##_fa,prefix##_fb,prefix##_fc,prefix##_fd,prefix##_fe,prefix##_ff  \
 }
 
-PROTOTYPES(Z80op,op);
+PROTOTYPES(__attribute__((unused)) Z80op,op);
 PROTOTYPES(Z80cb,cb);
 PROTOTYPES(Z80dd,dd);
 PROTOTYPES(Z80ed,ed);
@@ -3379,92 +3379,6 @@ static void take_interrupt(void)
  ****************************************************************************/
 void z80_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-  int i, p;
-
-#if 0
-  if( !SZHVC_add || !SZHVC_sub )
-  {
-    int oldval, newval, val;
-    UINT8 *padd, *padc, *psub, *psbc;
-    /* allocate big flag arrays once */
-    SZHVC_add = (UINT8 *)malloc(2*256*256);
-    SZHVC_sub = (UINT8 *)malloc(2*256*256);
-    if( !SZHVC_add || !SZHVC_sub )
-    {
-      return;
-    }
-    padd = &SZHVC_add[  0*256];
-    padc = &SZHVC_add[256*256];
-    psub = &SZHVC_sub[  0*256];
-    psbc = &SZHVC_sub[256*256];
-    for (oldval = 0; oldval < 256; oldval++)
-    {
-      for (newval = 0; newval < 256; newval++)
-      {
-        /* add or adc w/o carry set */
-        val = newval - oldval;
-        *padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-        *padd |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
-        if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
-        if( newval < oldval ) *padd |= CF;
-        if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
-        padd++;
-
-        /* adc with carry set */
-        val = newval - oldval - 1;
-        *padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-        *padc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
-        if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
-        if( newval <= oldval ) *padc |= CF;
-        if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
-        padc++;
-
-        /* cp, sub or sbc w/o carry set */
-        val = oldval - newval;
-        *psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-        *psub |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
-        if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
-        if( newval > oldval ) *psub |= CF;
-        if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
-        psub++;
-
-        /* sbc with carry set */
-        val = oldval - newval - 1;
-        *psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-        *psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
-        if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
-        if( newval >= oldval ) *psbc |= CF;
-        if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
-        psbc++;
-      }
-    }
-  }
-
-  for (i = 0; i < 256; i++)
-  {
-    p = 0;
-    if( i&0x01 ) ++p;
-    if( i&0x02 ) ++p;
-    if( i&0x04 ) ++p;
-    if( i&0x08 ) ++p;
-    if( i&0x10 ) ++p;
-    if( i&0x20 ) ++p;
-    if( i&0x40 ) ++p;
-    if( i&0x80 ) ++p;
-    SZ[i] = i ? i & SF : ZF;
-    SZ[i] |= (i & (YF | XF));    /* undocumented flag bits 5+3 */
-    SZ_BIT[i] = i ? i & SF : ZF | PF;
-    SZ_BIT[i] |= (i & (YF | XF));  /* undocumented flag bits 5+3 */
-    SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
-    SZHV_inc[i] = SZ[i];
-    if( i == 0x80 ) SZHV_inc[i] |= VF;
-    if( (i & 0x0f) == 0x00 ) SZHV_inc[i] |= HF;
-    SZHV_dec[i] = SZ[i] | NF;
-    if( i == 0x7f ) SZHV_dec[i] |= VF;
-    if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
-  }
-#endif
-
   /* Reset registers to their initial values */
   memset(&Z80, 0, sizeof(Z80));
   IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
@@ -3502,12 +3416,6 @@ void z80_reset(void)
 
 void z80_exit(void)
 {
-#if 0
-  if (SZHVC_add) free(SZHVC_add);
-  SZHVC_add = NULL;
-  if (SZHVC_sub) free(SZHVC_sub);
-  SZHVC_sub = NULL;
-#endif
 }
 
 /****************************************************************************
