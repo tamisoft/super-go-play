@@ -2,12 +2,13 @@
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "esp_event.h"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
 #include "nofrendo.h"
 #include "esp_partition.h"
 #include "esp_spiffs.h"
+#include "esp_sleep.h"
 
 #include "esp_err.h"
 #include "esp_log.h"
@@ -38,10 +39,6 @@ char *osd_getromdata()
 
 
 
-
-static const char *TAG = "main";
-
-
 int app_main(void)
 {
 	printf("nesemu (%s-%s).\n", COMPILEDATE, GITREV);
@@ -50,7 +47,6 @@ int app_main(void)
 
 	odroid_system_init();
 
-	esp_err_t ret;
 
 
 	char* fileName;
@@ -58,14 +54,14 @@ int app_main(void)
 	char* romName = odroid_settings_RomFilePath_get();
     if (romName)
     {
-        fileName = odroid_util_GetFileName(romName);
+        fileName = (char *)odroid_util_GetFileName(romName);
         if (!fileName) abort();
 
         free(romName);
     }
     else
     {
-        fileName = "nesemu-show3.nes";
+        fileName = (char *)"nesemu-show3.nes";
     }
 
 
@@ -138,8 +134,6 @@ int app_main(void)
 	{
 		printf("osd_getromdata: Reading from flash.\n");
 
-		// copy from flash
-		spi_flash_mmap_handle_t hrom;
 
 		const esp_partition_t* part = esp_partition_find_first(0x40, 0, NULL);
 		if (part == 0)

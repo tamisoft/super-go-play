@@ -346,7 +346,7 @@ static void SaveState()
     printf("Saving state OK.\n");
 }
 
-static void PowerDown()
+static void __attribute__((unused)) PowerDown()
 {
     // Stop tasks
     printf("PowerDown: stopping tasks.\n");

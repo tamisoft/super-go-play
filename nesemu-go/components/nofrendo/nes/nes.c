@@ -45,7 +45,7 @@
 #include <esp_attr.h>
 #include "esp_system.h"
 #include "../../odroid/odroid_input.h"
-
+#include "xtensa/hal.h"
 
 #define  NES_CLOCK_DIVIDER    12
 //#define  NES_MASTER_CLOCK     21477272.727272727272
