@@ -49,6 +49,6 @@ const byte DRAM_ATTR hi_wmap[256] =
 
 
 void sound_write();
-static void no_write()
+static void __attribute__((unused)) no_write()
 {
 }
