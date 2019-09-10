@@ -209,7 +209,7 @@ void sound_reset(void)
 
 void sound_update(int line)
 {
-  int16 *fm[2], *psg[2];
+  int16 *psg[2];
 
   if(!snd.enabled)
     return;
@@ -219,16 +219,9 @@ void sound_update(int line)
   {
     psg[0] = psg_buffer[0] + snd.done_so_far;
     psg[1] = psg_buffer[1] + snd.done_so_far;
-    fm[0]  = fm_buffer[0] + snd.done_so_far;
-    fm[1]  = fm_buffer[1] + snd.done_so_far;
 
     /* Generate SN76489 sample data */
     SN76489_Update(0, psg, snd.sample_count - snd.done_so_far);
-
-#if 0
-    /* Generate YM2413 sample data */
-    FM_Update(fm, snd.sample_count - snd.done_so_far);
-#endif
 
     /* Mix streams into output buffer */
     snd.mixer_callback(snd.stream, snd.output, snd.sample_count);
@@ -245,16 +238,9 @@ void sound_update(int line)
     /* Do a tiny bit */
     psg[0] = psg_buffer[0] + snd.done_so_far;
     psg[1] = psg_buffer[1] + snd.done_so_far;
-    fm[0]  = fm_buffer[0] + snd.done_so_far;
-    fm[1]  = fm_buffer[1] + snd.done_so_far;
 
     /* Generate SN76489 sample data */
     SN76489_Update(0, psg, tinybit);
-
-#if 0
-    /* Generate YM2413 sample data */
-    FM_Update(fm, tinybit);
-#endif
 
     /* Sum total */
     snd.done_so_far += tinybit;
